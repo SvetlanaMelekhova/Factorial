@@ -1,6 +1,5 @@
 package com.svetlana.learn.factorial
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +8,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
+
+    private val _state = MutableLiveData<State>()
+    val state: LiveData<State>
+        get() = _state
 
     private val _error = MutableLiveData<Boolean>()
     val error: LiveData<Boolean>
@@ -23,18 +26,16 @@ class MainViewModel : ViewModel() {
         get() = _progress
 
     fun calculate(value: String?) {
-        _progress.value = true
-        if (value.isNullOrBlank()){
-            _progress.value = false
-            _error.value = true
+        _state.value = State(isInProgress = true)
+        if (value.isNullOrBlank()) {
+            _state.value = State(isError = true)
             return
         }
-        viewModelScope.launch{
+        viewModelScope.launch {
             val number = value.toLong()
             //calculate
             delay(1000)
-            _progress.postValue(false)
-            _factorial.value = number.toString()
+            _state.value = State(factorial = number.toString())
         }
     }
 }
